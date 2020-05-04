@@ -6,7 +6,7 @@ void set_time(){
     srand(time(NULL));}
 // ------------------------
 
-Tools::Tools(Board &b1, Stats &s1, GameLogic &l1) : board(b1), stats(s1), logic(l1) {
+Tools::Tools(Board &b1, Stats &s1, Logic &l1) : board(b1), stats(s1), logic(l1) {
     set_time();
 }
 
@@ -15,6 +15,7 @@ void Tools::putFence(int row, int col) {
     if(board.isOnBoard(row,col)) {
         board.setFence(row,col, true);
         stats.countFence(true);
+        savePos("fence",row,col);
     }
     else {}
 }
@@ -23,6 +24,8 @@ void Tools::putFruit(int row, int col) {
     if(board.isOnBoard(row,col)) {
         board.setFruit(row,col, true);
         stats.countFruit(true);
+        stats.countunEaten(true);
+        savePos("fruit",row,col);
     }
     else {}
 }
@@ -31,6 +34,7 @@ void Tools::putObstacle(int row, int col) {
     if(board.isOnBoard(row,col)) {
         board.setObstacle(row,col, true);
         stats.countObstacle(true);
+        savePos("obstacle",row,col);
     }
     else {}
 }
@@ -89,8 +93,8 @@ void Tools::randomSpawn(std::string what) {
     for(int i=0;i<spawn;i++){
         int x_row = rand()%board.getBoardHeight();
         int y_col = rand()%board.getBoardWidth();
-        if(board.isAny(x_row,y_col))            // anytime
-                i--;
+        if(board.isAny(x_row,y_col) || board.isHeadAround(x_row,y_col))     // anytime
+            i--;
         else if(board.getTurn() == " "){        // start of the game
             if(board.isAny(x_row-1,y_col))
                 i--;
@@ -100,17 +104,44 @@ void Tools::randomSpawn(std::string what) {
     }
 }
 
+void Tools::savePos(std::string what, int x, int y) {
+    container temp;
+    temp.x = x;
+    temp.y = y;
+    if(what == "fence")
+        fencesPos.push_back(temp);
+    else if(what == "fruit")
+        fruitsPos.push_back(temp);
+    else if(what == "obstacle")
+        obstaclesPos.push_back(temp);
+}
+
 void Tools::getGameInfo() const {
-    std::cout << "[BOARD] Height of the board: " << board.getBoardHeight() << std::endl;
-    std::cout << "[BOARD] Width of the board: " << board.getBoardWidth() << std::endl;
-    std::cout << "[LOGIC] Game state: " << logic.getGameState() << std::endl;
-    std::cout << "[BOARD] Snake size: " << board.getSnakeSize() << std::endl;
-    std::cout << "[BOARD] limit: " << board.getSnakeLimit() << std::endl;
-    std::cout << "[BOARD] Current turn: " << board.getTurn() << std::endl;
-    std::cout << "[STATS] Fences: " << stats.getFenceCount() << std::endl;
-    std::cout << "[STATS] Fruits: " << stats.getFruitCount() << std::endl;
-    std::cout << "[STATS] Obstacles: " << stats.getObstacleCount() << std::endl;
-    std::cout << "[STATS] Points: " << stats.getPoints() << std::endl;
+    std::cout << "[LOGIC/GAME] Game state: " << logic.getGameState() << std::endl;
+    /////
+    std::cout << "[BOARD/SIZE] Height of the board: " << board.getBoardHeight() << std::endl;
+    std::cout << "[BOARD/SIZE] Width of the board: " << board.getBoardWidth() << std::endl;
+    //////
+    std::cout << "[BOARD/SNAKE] Snake size: " << board.getSnakeSize() << std::endl;
+    std::cout << "[BOARD/SNAKE] limit: " << board.getSnakeLimit() << std::endl;
+    std::cout << "[SNAKE/MOVE] Current turn: " << board.getTurn() << std::endl;
+    /////
+    std::cout << "[STATS] Current Fruits on Board:  " << stats.getFruitCountOnB() << std::endl;
+    std::cout << "[STATS] Total Fruits during game: " << stats.getFruitsTotal() << std::endl;
+    std::cout << "[STATS] Current Fences on Board: " << stats.getFenceCountOnB() << std::endl;
+    std::cout << "[STATS] Total Fences during game: " << stats.getFencesTotal() << std::endl;
+    std::cout << "[STATS] Current Obstacles on Board: " << stats.getObstacleCountOnB() << std::endl;
+    std::cout << "[STATS] Total Obstacles during game: " << stats.getObstaclesTotal() << std::endl;
+    /////
+    std::cout << "[STATS] Total Fruits eaten during game:  " << stats.getPointsOnB() << std::endl;
+    std::cout << "[STATS] Current uneaten food on Board: " << stats.getunEatenOnB() << std::endl;
+    std::cout << "[STATS] Total uneaten food during game:  " << stats.getTotalUneaten() << std::endl;
+    std::cout << "[STATS] Total Points earned during game: " << stats.getTotalPoints() << std::endl;
+    std::cout << std::endl;
+    std::cout << "FRUITS:" << std::endl;
+    for(int i=0;i<fruitsPos.size();i++){
+        std::cout << "Nr [" << i+1 << "] x: " << fruitsPos[i].x << " y: " << fruitsPos[i].y << std::endl;
+    }
     std::cout << std::endl;
 }
 
@@ -156,6 +187,32 @@ char Tools::getFieldInfo(int row, int col) const {
     else
         return ' ';
     return{};
+}
+
+void Tools::despawnOldest(std::string what) {
+    if(!logic.isRunning()) {}
+    else {
+        if (what == "fence") {
+            takeFence(fencesPos[0].x,fencesPos[0].y);
+            fencesPos.erase(fencesPos.begin());
+        } else if (what == "fruit") {
+            takeFruit(fruitsPos[0].x, fruitsPos[0].y);
+            fruitsPos.erase(fruitsPos.begin());
+        } else if (what == "obstacle") {
+            takeObstacle(obstaclesPos[0].x,obstaclesPos[0].y);
+            obstaclesPos.erase(obstaclesPos.begin());
+        }
+    }
+}
+
+void Tools::despawnThat(std::string what) {
+    if(what == "fruit") {
+        for (int i = 0; i < fruitsPos.size(); i++) {
+            if (board.hasSnake(fruitsPos[i].x, fruitsPos[i].y)) {
+                fruitsPos.erase(fruitsPos.begin() + i);
+            }
+        }
+    }
 }
 
 

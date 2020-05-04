@@ -51,10 +51,12 @@ public:
     //----- validation checker
     bool isOnBoard(int row, int col) const;
     bool isAny(int row, int col) const;
+    bool isSnakeOut()const;
     //----- snake
     bool isHead(int row, int col) const;
     bool isTorso(int row, int col) const;
     bool hasSnake(int row, int col) const;
+    bool isHeadAround(int row, int col) const;
     //----- things on board
     bool hasFence(int row, int col) const;
     bool hasFruit(int row, int col) const;
@@ -73,11 +75,12 @@ public:
     void eatFruit();
 
     ///// snake control
-    void toggleWH(bool toggle);
     void turn(char dir);
     std::string getTurn() const;
     void autoMove();
 
+    ///// top secret
+    void toggleWH(bool toggle);
 };
 
 

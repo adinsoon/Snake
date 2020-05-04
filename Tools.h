@@ -2,22 +2,30 @@
 #define SNAKEOLD_TOOLS_H
 #include "Board.h"
 #include "Stats.h"
-#include "GameLogic.h"
+#include "Logic.h"
 #include <string>
+
+struct container {
+    int x;
+    int y;
+};
 
 class Tools {
     Board &board;
     Stats &stats;
-    GameLogic &logic;
+    Logic &logic;
+    std::vector <container> fencesPos;
+    std::vector <container> fruitsPos;
+    std::vector <container> obstaclesPos;
 public:
-    Tools(Board &b1, Stats &s1, GameLogic &c1);
+    Tools(Board &b1, Stats &s1, Logic &c1);
 
     ///// use alone only when needed - putters
     void putFence(int row, int col);
     void putFruit(int row, int col);
     void putObstacle(int row, int col);
 
-    ///// create walls around
+    ///// create walls around - start of the game
     void fenceFill();
 
     ///// use alone only when needed - takers
@@ -25,9 +33,12 @@ public:
     void takeFruit(int row, int col);
     void takeObstacle(int row, int col);
 
-    ///// spawn section
+    ///// re-/de- spawn section
     void fixedSpawn(std::string what, int x, int y);
     void randomSpawn(std::string what);
+    void savePos(std::string what, int x, int y);
+    void despawnOldest(std::string what);
+    void despawnThat(std::string what);
 
     ///// diagnostic info
     void getGameInfo() const;

@@ -1,60 +1,174 @@
 #include "SFMLController.h"
 #include "TextView.h"
+#include <chrono>
+#include <thread>
 
-SFMLController::SFMLController(Stats &s1, Board &b1, Tools &t1, Controller &c1, SFMLView &v1) : stats(s1), board(b1), tools(t1), ctrl(c1), view(v1){
+SFMLController::SFMLController(Stats &s1, Board &b1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1)
+                                : stats(s1), board(b1), logic(l1), tools(t1), ctrl(c1), menu(m1) , view(v1){
     // GameWindow.setVerticalSyncEnabled(true); //or
     // GameWindow.setFramerateLimit(30);
-    haps.loadFromFile("..\\sounds\\haps.ogg");
+    int a = rand()%2;
+    int b = rand()%2;
+    if(a==0)
+        haps.loadFromFile("..\\sounds\\haps.ogg");
+    if(a==1)
+        haps.loadFromFile("..\\sounds\\coin.ogg");
+    if(b==0)
+        loss.loadFromFile("..\\sounds\\lose.ogg");
+    if(b==1)
+        loss.loadFromFile("..\\sounds\\error.ogg");
+    win.loadFromFile("..\\sounds\\win.ogg");
+    start.loadFromFile("..\\sounds\\start.ogg");
+    myFont.loadFromFile("..\\font\\arial.ttf");
+//    music=true;
 
 }
 
 void SFMLController::play() {
-    int scr_height = board.getBoardHeight() * cell;
-    int scr_width = board.getBoardWidth() * cell;
+    if(menu.getGameMode() == 0) game = "SNAKE - CREATIVE MODE";
+    else if(menu.getGameMode() == 1) game = "SNAKE - BASIC MODE";
+    constexpr int scr_height = 595;
+    constexpr int scr_width = 525;
+    ////// TIME
+    std::string gameSec;
+    std::string gameMin;
     sf::Clock clock;
-    float timer=0;
-    float delay=0.15;
-    eat.setBuffer(haps);
+    int seconds=0;
+    int minutes=0;
+    ///// POINTS
+    std::string gamePoints;
+    std::string gameRemain;
+    //////
+    bool playmusic = false;
     int pre,post;
-    sf::RenderWindow GameWindow(sf::VideoMode(scr_width, scr_height), "Snake Game");
+    //////
+    displayStats();
+    sf::RenderWindow GameWindow(sf::VideoMode(scr_width, scr_height), game);
     while (GameWindow.isOpen()) {
-        float time = clock.getElapsedTime().asSeconds();
-        clock.restart();
-        timer += time;
-        sf::Event event{};
-        pre = stats.getFoodEaten();
-        while (GameWindow.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                GameWindow.close();
-            else if (event.type == sf::Event::KeyPressed &&
-                     ((event.key.code == sf::Keyboard::Up) || (event.key.code == sf::Keyboard::W))) {
-                ctrl.move('w');
-                tools.getGameInfo();
+        if (logic.getGameState() == WIN || logic.getGameState() == LOSS) {
+            if(!playmusic){
+                if(logic.getGameState() == LOSS) sound.setBuffer(loss);
+                else if(logic.getGameState() == WIN) sound.setBuffer(win);
+                sound.play();
+                playmusic = true;
             }
-            else if (event.type == sf::Event::KeyPressed &&
-                     ((event.key.code == sf::Keyboard::Down) || (event.key.code == sf::Keyboard::S))) {
-                ctrl.move('s');
-            }
-            else if (event.type == sf::Event::KeyPressed &&
-                     ((event.key.code == sf::Keyboard::Left) || (event.key.code == sf::Keyboard::A))) {
-                ctrl.move('a');
-            }
-            else if (event.type == sf::Event::KeyPressed &&
-                     ((event.key.code == sf::Keyboard::Right) || (event.key.code == sf::Keyboard::D))) {
-                ctrl.move('d');
+            sf::Event event{};
+            while (GameWindow.pollEvent(event)) {
+                if (event.type == sf::Event::Closed)
+                    GameWindow.close();
             }
         }
-        GameWindow.clear(sf::Color::Blue);
-        if(timer>delay){
-            timer=0;
-            ctrl.delayMove();
+        else {
+            ////// TIME
+            float time = clock.getElapsedTime().asSeconds();
+            clock.restart();
+            timers.timeMovement += time;
+            timers.timeSpawnFruit += time;
+            timers.timeSpawnObstacles += time;
+            timers.gameSec += time;
+            timers.gameMin += time;
+            ////////     CLOCK
+            seconds = static_cast<int>(timers.gameSec);
+            minutes = static_cast<int>(timers.gameMin / 60);
+            if (seconds == 60) timers.gameSec = 0;
+            gameSec = std::to_string(seconds);
+            gameMin = std::to_string(minutes);
+            counter[0].setString(gameMin);
+            counter[2].setString(gameSec);
+            ////////////////////
+            displayStats();
+            sf::Event event{};
+            pre = stats.getTotalFoodEaten();
+            while (GameWindow.pollEvent(event)) {
+                if (event.type == sf::Event::Closed)
+                    GameWindow.close();
+                else if (event.type == sf::Event::KeyPressed &&
+                         ((event.key.code == sf::Keyboard::Up) || (event.key.code == sf::Keyboard::W))) {
+                    ctrl.move('w');
+                    tools.getGameInfo();
+                } else if (event.type == sf::Event::KeyPressed &&
+                           ((event.key.code == sf::Keyboard::Down) || (event.key.code == sf::Keyboard::S))) {
+                    ctrl.move('s');
+                } else if (event.type == sf::Event::KeyPressed &&
+                           ((event.key.code == sf::Keyboard::Left) || (event.key.code == sf::Keyboard::A))) {
+                    ctrl.move('a');
+                } else if (event.type == sf::Event::KeyPressed &&
+                           ((event.key.code == sf::Keyboard::Right) || (event.key.code == sf::Keyboard::D))) {
+                    ctrl.move('d');
+                }
+            }
+            ////////// POINTS
+            gamePoints = std::to_string(stats.getTotalPoints());
+            points.setString(gamePoints);
+            ////////// REMAINING
+            gameRemain = std::to_string(board.getSnakeLimit() - board.getSnakeSize());
+            remain.setString(gameRemain);
+            /////////
+            GameWindow.clear(sf::Color::Blue);
+            view.drawBoard(GameWindow);
+            GameWindow.draw(counter[0]);
+            GameWindow.draw(counter[1]);
+            GameWindow.draw(counter[2]);
+            GameWindow.draw(points);
+            GameWindow.draw(remain);
+            GameWindow.display();
+            moveCtrl();
+            spawnCtrl();
+            post = stats.getTotalFoodEaten();
+            if (pre < post) {
+                sound.setBuffer(haps);
+                sound.play();
+            }
         }
-        post=stats.getFoodEaten();
-        if(pre<post)
-            eat.play();
-        if(stats.getFruitCount() == 0)
-            tools.randomSpawn("fruit");
-        view.drawBoard(GameWindow);
-        GameWindow.display();
     }
 }
+
+void SFMLController::spawnCtrl() {
+    if(menu.getGameMode() == 0) {
+        if (timers.timeSpawnObstacles > timers.delayObsResp) {
+            timers.timeSpawnObstacles = 0;
+            tools.despawnOldest("obstacle");
+        }
+        else if (stats.getObstacleCountOnB() < ctrl.getObsAllowed())
+            tools.randomSpawn("obstacle");
+    }
+    if(timers.timeSpawnFruit>timers.delayFruitResp) {
+        timers.timeSpawnFruit = 0;
+        tools.despawnOldest("fruit");
+    }
+    else if(stats.getFruitCountOnB()<ctrl.getFruAllowed()){
+        timers.timeSpawnFruit=0;
+        tools.randomSpawn("fruit");
+        tools.despawnThat("fruit");
+    }
+}
+
+void SFMLController::moveCtrl() {
+    if (timers.timeMovement > timers.delayMovement) {
+        timers.timeMovement = 0;
+        ctrl.delayMove();
+    }
+}
+
+void SFMLController::displayStats() {
+    for(int i=0;i<3;i++){
+        counter[i].setFont(myFont);
+        counter[i].setFillColor(sf::Color::Black);
+        counter[i].setCharacterSize(15);
+    }
+    counter[1].setCharacterSize(17);
+    counter[1].setString(":");
+    counter[0].setPosition(150,42);
+    counter[1].setPosition(159,39);
+    counter[2].setPosition(165,42);
+    points.setFont(myFont);
+    points.setFillColor(sf::Color::Black);
+    points.setCharacterSize(15);
+    points.setPosition(265,42);
+    remain.setFont(myFont);
+    remain.setFillColor(sf::Color::Black);
+    remain.setCharacterSize(15);
+    remain.setPosition(410,42);
+}
+
+

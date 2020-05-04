@@ -2,22 +2,27 @@
 #define SNAKEOLD_CONTROLLER_H
 #include "Board.h"
 #include "Stats.h"
-#include "GameLogic.h"
+#include "Logic.h"
 #include "Tools.h"
-
-enum GameMode {BASIC, CREATIVE};
+#include "Menu.h"
+#include <string>
 
 class Controller {
     Stats &stats;
     Board &board;
-    GameLogic &logic;
+    Logic &logic;
     Tools &tools;
     GameMode mode;
+    int fruitsAmount;
+    int obstaclesAmount;
 public:
-    Controller(Stats &s1, Board &b1, GameLogic &l1, Tools &t1, GameMode m);
+    Controller(Stats &s1, Board &b1, Logic &l1, Tools &t1, GameMode m, int fruAm=5, int obsAm=10);
     void move(char dir);
     void delayMove();
-    void play();
+
+    int getFruAllowed() const;
+    int getObsAllowed() const;
+    GameMode getGameMode() const;
 };
 
 
