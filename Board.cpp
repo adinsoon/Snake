@@ -5,6 +5,17 @@ Board::Board(int h, int w, int limit, Stats &s) : stats(s){
     height = h;
     width = w;
     snakeLimit = limit;
+    for(int row=0;row<100;row++){
+        snake[row].x = 0;
+        snake[row].y = 0;
+        for(int col=0;col<100;col++){
+            board[row][col].hasTorso = false;
+            board[row][col].hasHead = false;
+            board[row][col].hasFence = false;
+            board[row][col].hasFruit = false;
+            board[row][col].hasObstacle = false;
+        }
+    }
     snake[0].x = height/2;
     snake[0].y = snake[1].y = (width/2);
     snake[1].x = snake[0].x+1;
@@ -160,9 +171,9 @@ void Board::eatFruit() {
     if(isEaten()) {
         setFruit(snake[0].x, snake[0].y, false);
         growSnake(true);
-        stats.countPoints(5, true);
+        stats.countPoints(true);
         stats.countFruit(false);
-        stats.countunEaten(false);
+        stats.countUnEaten(false);
         stats.countFoodEaten(true);
     }
 }
@@ -172,9 +183,7 @@ void Board::toggleWH(bool toggle) {
 }
 
 bool Board::isSnakeOut() const{
-    if(!isOnBoard(snake[0].x,snake[0].y))
-        return true;
-    return false;
+    return !isOnBoard(snake[0].x, snake[0].y);
 }
 
 bool Board::isHeadAround(int row, int col) const {
@@ -182,6 +191,20 @@ bool Board::isHeadAround(int row, int col) const {
         for(int j=-3;j<4;j++){
             if(isHead(row+i,col+j))
                 return true;
+        }
+    }
+    return false;
+}
+
+void Board::clearSnake() {
+    for(int i=0;i<snakeSize;i++){
+        snake[i].x = 0;
+        snake[i].y = 0;
+    }
+    for(int i=0;i<height;i++){
+        for(int j=0;i<width;j++){
+            board[i][j].hasHead = false;
+            board[i][j].hasTorso = false;
         }
     }
 }

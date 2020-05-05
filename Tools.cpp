@@ -24,7 +24,7 @@ void Tools::putFruit(int row, int col) {
     if(board.isOnBoard(row,col)) {
         board.setFruit(row,col, true);
         stats.countFruit(true);
-        stats.countunEaten(true);
+        stats.countUnEaten(true);
         savePos("fruit",row,col);
     }
     else {}
@@ -134,7 +134,7 @@ void Tools::getGameInfo() const {
     std::cout << "[STATS] Total Obstacles during game: " << stats.getObstaclesTotal() << std::endl;
     /////
     std::cout << "[STATS] Total Fruits eaten during game:  " << stats.getPointsOnB() << std::endl;
-    std::cout << "[STATS] Current uneaten food on Board: " << stats.getunEatenOnB() << std::endl;
+    std::cout << "[STATS] Current uneaten food on Board: " << stats.getUnEatenOnB() << std::endl;
     std::cout << "[STATS] Total uneaten food during game:  " << stats.getTotalUneaten() << std::endl;
     std::cout << "[STATS] Total Points earned during game: " << stats.getTotalPoints() << std::endl;
     std::cout << std::endl;

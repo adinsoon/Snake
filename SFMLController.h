@@ -7,6 +7,7 @@
 #include "SFMLView.h"
 #include <iostream>
 #include "Menu.h"
+#include "Manager.h"
 #include <string>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -25,6 +26,7 @@ struct Timers {
 class SFMLController {
     Stats &stats;
     Board &board;
+    Manager &mgr;
     Logic &logic;
     Tools &tools;
     Controller &ctrl;
@@ -36,8 +38,10 @@ class SFMLController {
     sf::SoundBuffer win;
     sf::SoundBuffer loss;
     sf::SoundBuffer start;
+    sf::SoundBuffer up;
     sf::Sound sound;
     const int cell = 21;
+    int upgrade=1;
     sf::Font myFont;
     sf::Text counter[3];
     sf::Text points;
@@ -46,8 +50,9 @@ class SFMLController {
     void spawnCtrl();
     void moveCtrl();
     void displayStats();
+    void UP();
 public:
-    SFMLController(Stats &s1, Board &b1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1);
+    SFMLController(Stats &s1, Board &b1, Manager &mgr1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1);
     void play();
 };
 

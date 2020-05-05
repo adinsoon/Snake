@@ -11,6 +11,8 @@ Stats::Stats() {
         unEatenCount[i]=0;
     }
     pointsEarned = 0;
+    gameSeconds = 0;
+    gameMinutes = 0;
 }
 
 ///// COUNT BOTH
@@ -48,20 +50,22 @@ void Stats::countFoodEaten(bool food) {
     else foodCount[0]--;
 }
 
-void Stats::countPoints(int howmuch, bool points) {
+void Stats::countPoints(bool points) {
     if(points) {
         pointsEarned += howmuch;
     }
     else pointsEarned -= howmuch;
 }
 
-void Stats::countunEaten(bool food) {
+void Stats::countUnEaten(bool food) {
     if(food) {
         unEatenCount[0]++;
         unEatenCount[1]++;
     }
-    else
+    else {
         unEatenCount[0]--;
+        unEatenCount[1]--;
+    }
 }
 
 ///// GET ON BOARD
@@ -82,7 +86,7 @@ int Stats::getPointsOnB() const{
     return foodCount[0];
 }
 
-int Stats::getunEatenOnB() const {
+int Stats::getUnEatenOnB() const {
     return unEatenCount[0];
 }
 
@@ -110,4 +114,36 @@ int Stats::getTotalPoints() const {
 
 int Stats::getTotalUneaten() const {
     return unEatenCount[1];
+}
+
+void Stats::setGameMinutes(int m) {
+    gameMinutes += m;
+}
+
+void Stats::setGameSeconds(int s) {
+    gameSeconds += s;
+}
+
+void Stats::setRemaining(int h) {
+    remaining += h;
+}
+
+int Stats::getGameMinutes() const {
+    return gameMinutes;
+}
+
+int Stats::getGameSeconds() const {
+    return gameSeconds;
+}
+
+int Stats::getRemaining() const {
+    return remaining;
+}
+
+void Stats::setPointsRate(int q) {
+    howmuch = q;
+}
+
+int Stats::getPointsRate() const {
+    return howmuch;
 }

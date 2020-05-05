@@ -2,9 +2,10 @@
 #include "TextView.h"
 #include <chrono>
 #include <thread>
+#include "PostGame.h"
 
-SFMLController::SFMLController(Stats &s1, Board &b1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1)
-                                : stats(s1), board(b1), logic(l1), tools(t1), ctrl(c1), menu(m1) , view(v1){
+SFMLController::SFMLController(Stats &s1, Board &b1, Manager &mgr1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1)
+                                : stats(s1), board(b1), mgr(mgr1), logic(l1), tools(t1), ctrl(c1), menu(m1) , view(v1){
     // GameWindow.setVerticalSyncEnabled(true); //or
     // GameWindow.setFramerateLimit(30);
     int a = rand()%2;
@@ -19,12 +20,14 @@ SFMLController::SFMLController(Stats &s1, Board &b1, Logic &l1, Tools &t1, Contr
         loss.loadFromFile("..\\sounds\\error.ogg");
     win.loadFromFile("..\\sounds\\win.ogg");
     start.loadFromFile("..\\sounds\\start.ogg");
+    up.loadFromFile("..\\sounds\\up.ogg");
     myFont.loadFromFile("..\\font\\arial.ttf");
-//    music=true;
-
 }
 
 void SFMLController::play() {
+    timers.gameSec=0;
+    timers.gameMin=0;
+    PostGame breakdown(stats,board,mgr);
     if(menu.getGameMode() == 0) game = "SNAKE - CREATIVE MODE";
     else if(menu.getGameMode() == 1) game = "SNAKE - BASIC MODE";
     constexpr int scr_height = 595;
@@ -40,24 +43,43 @@ void SFMLController::play() {
     std::string gameRemain;
     //////
     bool playmusic = false;
+    bool showresult = false;
     int pre,post;
     //////
     displayStats();
     sf::RenderWindow GameWindow(sf::VideoMode(scr_width, scr_height), game);
     while (GameWindow.isOpen()) {
+        ////////// FINISHED GAME
+        sf::Event event{};
         if (logic.getGameState() == WIN || logic.getGameState() == LOSS) {
+            stats.setGameMinutes(minutes);
+            stats.setGameSeconds(seconds);
+            stats.setRemaining(board.getSnakeLimit() - board.getSnakeSize());
             if(!playmusic){
                 if(logic.getGameState() == LOSS) sound.setBuffer(loss);
                 else if(logic.getGameState() == WIN) sound.setBuffer(win);
                 sound.play();
                 playmusic = true;
             }
-            sf::Event event{};
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            if(!showresult) {
+                ////////// RESULTS
+                ///// WIN
+                if (logic.getGameState() == WIN) {
+                    breakdown.drawPostGame(1);
+                }
+                ///// LOSS
+                else if (logic.getGameState() == LOSS) {
+                    breakdown.drawPostGame(0);
+                }
+                showresult = true;
+            }
             while (GameWindow.pollEvent(event)) {
                 if (event.type == sf::Event::Closed)
-                    GameWindow.close();
+                    exit(0);
             }
         }
+        ////////// RUNNING GAME
         else {
             ////// TIME
             float time = clock.getElapsedTime().asSeconds();
@@ -80,8 +102,10 @@ void SFMLController::play() {
             sf::Event event{};
             pre = stats.getTotalFoodEaten();
             while (GameWindow.pollEvent(event)) {
-                if (event.type == sf::Event::Closed)
+                if (event.type == sf::Event::Closed) {
                     GameWindow.close();
+                    mgr.setGame(0);
+                }
                 else if (event.type == sf::Event::KeyPressed &&
                          ((event.key.code == sf::Keyboard::Up) || (event.key.code == sf::Keyboard::W))) {
                     ctrl.move('w');
@@ -119,6 +143,7 @@ void SFMLController::play() {
                 sound.setBuffer(haps);
                 sound.play();
             }
+            UP();
         }
     }
 }
@@ -169,6 +194,16 @@ void SFMLController::displayStats() {
     remain.setFillColor(sf::Color::Black);
     remain.setCharacterSize(15);
     remain.setPosition(410,42);
+}
+
+void SFMLController::UP() {
+    if (board.getSnakeSize()==10*upgrade){
+        sound.setBuffer(up);
+        sound.play();
+        upgrade++;
+        timers.delayMovement -= 0.01;
+        stats.setPointsRate(stats.getPointsRate()+5);
+    }
 }
 
 
