@@ -3,14 +3,12 @@
 Controller::Controller(Stats &s1, Board &b1, Logic &l1, Tools &t1, GameMode m, int fruAm, int obsAm)
                     : stats(s1), board(b1), logic(l1), tools(t1), mode(m), fruitsAmount(fruAm), obstaclesAmount(obsAm) {
     if(mode == BASIC){
-        // board.toggleWH(false);
         tools.fenceFill();
         fruitsAmount = 1;
         obstaclesAmount = 0;
         tools.randomSpawn("fruit");
     }
     if(mode == CREATIVE){
-        // board.toggleWH(true);
         tools.fenceFill();
         for(int i=0;i<fruitsAmount;i++)
             tools.randomSpawn("fruit");

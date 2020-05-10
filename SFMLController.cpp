@@ -4,8 +4,8 @@
 #include <thread>
 #include "PostGame.h"
 
-SFMLController::SFMLController(Stats &s1, Board &b1, Manager &mgr1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1)
-                                : stats(s1), board(b1), mgr(mgr1), logic(l1), tools(t1), ctrl(c1), menu(m1) , view(v1){
+SFMLController::SFMLController(Stats &s1, Board &b1, Manager &mgr1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1, Highscore &s)
+                                : stats(s1), board(b1), mgr(mgr1), logic(l1), tools(t1), ctrl(c1), menu(m1) , view(v1), score(s){
     // GameWindow.setVerticalSyncEnabled(true); //or
     // GameWindow.setFramerateLimit(30);
     int a = rand()%2;
@@ -27,7 +27,7 @@ SFMLController::SFMLController(Stats &s1, Board &b1, Manager &mgr1, Logic &l1, T
 void SFMLController::play() {
     timers.gameSec=0;
     timers.gameMin=0;
-    PostGame breakdown(stats,board,mgr);
+    PostGame breakdown(stats,board,mgr,score);
     if(menu.getGameMode() == 0) game = "SNAKE - CREATIVE MODE";
     else if(menu.getGameMode() == 1) game = "SNAKE - BASIC MODE";
     constexpr int scr_height = 595;
@@ -72,6 +72,7 @@ void SFMLController::play() {
                 else if (logic.getGameState() == LOSS) {
                     breakdown.drawPostGame(0);
                 }
+                GameWindow.close();
                 showresult = true;
             }
             while (GameWindow.pollEvent(event)) {
@@ -99,7 +100,6 @@ void SFMLController::play() {
             counter[2].setString(gameSec);
             ////////////////////
             displayStats();
-            sf::Event event{};
             pre = stats.getTotalFoodEaten();
             while (GameWindow.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
@@ -202,7 +202,7 @@ void SFMLController::UP() {
         sound.play();
         upgrade++;
         timers.delayMovement -= 0.01;
-        stats.setPointsRate(stats.getPointsRate()+5);
+        stats.setPointsRate(stats.getPointsRate()+30);
     }
 }
 

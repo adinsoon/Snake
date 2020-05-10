@@ -6,11 +6,13 @@
 #include "Stats.h"
 #include "Board.h"
 #include "Manager.h"
+#include "Highscore.h"
 
 class PostGame {
     Stats &stats;
     Board &board;
     Manager &manage;
+    Highscore &sc;
     sf::Texture win;
     sf::Texture loss;
     sf::Texture again;
@@ -39,7 +41,7 @@ class PostGame {
     void format();
     int fsize=16;
 public:
-    PostGame(Stats &s1, Board &b1, Manager &man1);
+    PostGame(Stats &s1, Board &b1, Manager &man1, Highscore &ss);
     void drawPostGame(int n);
 };
 

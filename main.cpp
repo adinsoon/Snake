@@ -10,27 +10,25 @@
 #include "Menu.h"
 #include "Manager.h"
 #include "PostGame.h"
-#include <fstream>
+#include "Highscore.h"
 
 using namespace std;
 
-void GameHandler(){
-
-}
 
 int main() {
     Manager mgr;
     do {
-        Menu menu;
+        Highscore scores;
+        Menu menu(scores);
         menu.showMenu();
         do {
             Stats stats;
-            Board board(25, 25, 100, stats);
+            Board board(25, 25, 50, stats);
             Logic logic(board);
             Tools tool(board, stats, logic);
             Controller controller(stats, board, logic, tool, menu.getGameMode());
             SFMLView view(board, tool, menu);
-            SFMLController ctrl(stats, board, mgr, logic, tool, controller, menu, view);
+            SFMLController ctrl(stats, board, mgr, logic, tool, controller, menu, view, scores);
             ctrl.play();
         }while (mgr.getGame() == 2);
     }while (mgr.getGame() == 1);

@@ -32,6 +32,7 @@ class SFMLController {
     Controller &ctrl;
     Menu &menu;
     SFMLView &view;
+    Highscore &score;
     Timers timers;
     std::string game;
     sf::SoundBuffer haps;
@@ -52,7 +53,7 @@ class SFMLController {
     void displayStats();
     void UP();
 public:
-    SFMLController(Stats &s1, Board &b1, Manager &mgr1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1);
+    SFMLController(Stats &s1, Board &b1, Manager &mgr1, Logic &l1, Tools &t1, Controller &c1, Menu &m1, SFMLView &v1, Highscore &s);
     void play();
 };
 

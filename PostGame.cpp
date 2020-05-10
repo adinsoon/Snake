@@ -1,6 +1,6 @@
 #include "PostGame.h"
 
-PostGame::PostGame(Stats &s1, Board &b1, Manager &man1) : stats(s1), board(b1), manage(man1) {
+PostGame::PostGame(Stats &s1, Board &b1, Manager &man1, Highscore &ss) : stats(s1), board(b1), manage(man1), sc(ss) {
     win.loadFromFile("..\\icons\\result\\win.png");
     loss.loadFromFile("..\\icons\\result\\lose.png");
     again.loadFromFile("..\\icons\\result\\again.png");
@@ -11,6 +11,7 @@ PostGame::PostGame(Stats &s1, Board &b1, Manager &man1) : stats(s1), board(b1), 
 
 void PostGame::drawPostGame(int n) {
     format();
+    sc.saveScores(points,times[0],times[1],sizee);
     if (n == 1) { //WIN
         title = "WIN!";
         result.setString("COOL!");
@@ -28,6 +29,7 @@ void PostGame::drawPostGame(int n) {
         while (PostGame.pollEvent(e)) {
             if (e.type == sf::Event::Closed) {
                 PostGame.close();
+                exit(0);
             }
             else if (e.type == sf::Event::MouseButtonPressed) {
                 if (e.mouseButton.button == sf::Mouse::Left) {
@@ -146,4 +148,6 @@ void PostGame::format() {
     fruit[0].setPosition(300,140);
     fruit[1].setPosition(300,160);
     fruit[2].setPosition(300,180);
+    ///////////////////////////////////////
+
 }

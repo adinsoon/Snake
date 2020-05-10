@@ -17,7 +17,7 @@ class Stats {
     int gameSeconds;
     int remaining;
 
-    int howmuch=5;
+    int howmuch=20;
 public:
     Stats();
     void countFence(bool fence);
