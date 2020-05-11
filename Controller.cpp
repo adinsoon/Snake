@@ -17,6 +17,8 @@ Controller::Controller(Stats &s1, Board &b1, Logic &l1, Tools &t1, GameMode m, i
     }
 }
 
+////////////////////////////////////////////////
+
 int Controller::getFruAllowed() const {
     return fruitsAmount;
 }
@@ -28,6 +30,8 @@ int Controller::getObsAllowed() const {
 GameMode Controller::getGameMode() const {
     return mode;
 }
+
+////////////////////////////////////////////////
 
 void Controller::move(char dir) {
     if(!logic.isRunning()){}

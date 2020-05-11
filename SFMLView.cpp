@@ -30,6 +30,8 @@ SFMLView::SFMLView(Board &b1, Tools &t1, Menu &m1) : board(b1), tools(t1), menu(
     else if(obs == "lake") obstacle.loadFromFile("..\\icons\\obstacle\\lake.png");
 }
 
+////////////////////////////////////////////////
+
 void SFMLView::drawBoard(sf::RenderWindow &win1) {
     bar.setTexture(upperbar);
     win1.draw(bar);

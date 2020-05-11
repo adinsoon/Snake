@@ -45,7 +45,7 @@ public:
 
     int getTotalPoints() const;
 
-    ////////// AFTER GAME - TO SCOREBOARD
+    // AFTER GAME - TO SCOREBOARD
     void setGameMinutes(int m);
     void setGameSeconds(int s);
     void setRemaining(int h);

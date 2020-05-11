@@ -109,7 +109,7 @@ void SFMLController::play() {
                 else if (event.type == sf::Event::KeyPressed &&
                          ((event.key.code == sf::Keyboard::Up) || (event.key.code == sf::Keyboard::W))) {
                     ctrl.move('w');
-                    tools.getGameInfo();
+                    // tools.getGameInfo(); // diagnostic tool
                 } else if (event.type == sf::Event::KeyPressed &&
                            ((event.key.code == sf::Keyboard::Down) || (event.key.code == sf::Keyboard::S))) {
                     ctrl.move('s');
@@ -136,9 +136,10 @@ void SFMLController::play() {
             GameWindow.draw(points);
             GameWindow.draw(remain);
             GameWindow.display();
-            moveCtrl();
-            spawnCtrl();
+            moveCtrl(); // delay move
+            spawnCtrl();    // check if fruits or obstacles are needed to re-spawn/de-spawn
             post = stats.getTotalFoodEaten();
+            ///// play eating sound
             if (pre < post) {
                 sound.setBuffer(haps);
                 sound.play();
@@ -150,6 +151,7 @@ void SFMLController::play() {
 
 void SFMLController::spawnCtrl() {
     if(menu.getGameMode() == 0) {
+        // if MODE == CREATIVE
         if (timers.timeSpawnObstacles > timers.delayObsResp) {
             timers.timeSpawnObstacles = 0;
             tools.despawnOldest("obstacle");
@@ -158,8 +160,11 @@ void SFMLController::spawnCtrl() {
             tools.randomSpawn("obstacle");
     }
     if(timers.timeSpawnFruit>timers.delayFruitResp) {
+        // fruit will de-spawn and re-spawn on different location if snake will not eat this fruit for too long
         timers.timeSpawnFruit = 0;
         tools.despawnOldest("fruit");
+        // penalty for not eating on time
+        stats.setPointsRate(stats.getPointsRate()-upgrade*10);
     }
     else if(stats.getFruitCountOnB()<ctrl.getFruAllowed()){
         timers.timeSpawnFruit=0;
@@ -169,6 +174,7 @@ void SFMLController::spawnCtrl() {
 }
 
 void SFMLController::moveCtrl() {
+    // snake will move if player will stay idle for too long
     if (timers.timeMovement > timers.delayMovement) {
         timers.timeMovement = 0;
         ctrl.delayMove();
@@ -176,6 +182,7 @@ void SFMLController::moveCtrl() {
 }
 
 void SFMLController::displayStats() {
+    ///// display time, points and remaining fruits to eat
     for(int i=0;i<3;i++){
         counter[i].setFont(myFont);
         counter[i].setFillColor(sf::Color::Black);
@@ -197,6 +204,7 @@ void SFMLController::displayStats() {
 }
 
 void SFMLController::UP() {
+    // every 10 fruits snake will move faster and gain more points for each fruit
     if (board.getSnakeSize()==10*upgrade){
         sound.setBuffer(up);
         sound.play();

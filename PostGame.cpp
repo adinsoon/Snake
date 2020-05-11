@@ -78,6 +78,8 @@ void PostGame::drawPostGame(int n) {
     }
 }
 
+////////////////////////////////////////////////
+
 void PostGame::format() {
     button[0].setTexture(again);
     button[1].setTexture(menu);

@@ -447,9 +447,7 @@ void Menu::showMenu() {
                 MenuWin.draw(sprites[3]);
                 /////     BUTTONS
                 play[1].setTexture(playButtonOFF);
-
                 sprites[2].setTexture(hscoresButtonOFF);
-
                 MenuWin.draw(play[1]);
                 MenuWin.draw(sprites[2]);
                 /////     INTERACTIVE MAIN BUTTON
@@ -470,10 +468,8 @@ void Menu::showMenu() {
                 MenuWin.draw(sprites[3]);
                 sprites[1].setTexture(basic);
                 sprites[1].setTextureRect(sf::IntRect(0, 0, 200, 43));
-
                 sprites[2].setTexture(creative);
                 sprites[2].setTextureRect(sf::IntRect(0, 0, 200, 43));
-
                 sprites[4].setTexture(returnOFF);
                 MenuWin.draw(sprites[1]);
                 MenuWin.draw(sprites[2]);
@@ -497,7 +493,6 @@ void Menu::showMenu() {
             //////     CREATIVE MODE OPTIONS
             if (menu == 3) {
                 MenuWin.clear(sf::Color::Black);
-
                 snakes[1].setTexture(snakeOFF);
                 MenuWin.draw(snakes[0]);
                 choices[0].setTexture(choosefruit);

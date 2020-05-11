@@ -13,6 +13,7 @@ class PostGame {
     Board &board;
     Manager &manage;
     Highscore &sc;
+
     sf::Texture win;
     sf::Texture loss;
     sf::Texture again;
@@ -25,7 +26,6 @@ class PostGame {
     sf::Text result;
     //////
     sf::Font myFont;
-    //////
     //////
     sf::Text time[4];
     std::string times[2];

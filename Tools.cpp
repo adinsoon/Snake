@@ -10,6 +10,7 @@ Tools::Tools(Board &b1, Stats &s1, Logic &l1) : board(b1), stats(s1), logic(l1) 
     set_time();
 }
 
+///////////////////////////////////////////////
 
 void Tools::putFence(int row, int col) {
     if(board.isOnBoard(row,col)) {
@@ -39,6 +40,8 @@ void Tools::putObstacle(int row, int col) {
     else {}
 }
 
+///////////////////////////////////////////////
+
 void Tools::takeFence(int row, int col) {
     if(board.isOnBoard(row,col)) {
         board.setFence(row,col, false);
@@ -63,6 +66,8 @@ void Tools::takeObstacle(int row, int col) {
     else {}
 }
 
+///////////////////////////////////////////////
+
 void Tools::fenceFill() {
     for(int row=0;row<board.getBoardHeight();row++) {
         for (int col = 0; col < board.getBoardWidth(); col++) {
@@ -71,6 +76,8 @@ void Tools::fenceFill() {
         }
     }
 }
+
+///////////////////////////////////////////////
 
 void Tools::fixedSpawn(std::string what, int x, int y) {
     if((logic.getGameState() == WIN) || (logic.getGameState() == LOSS)) {}
@@ -104,6 +111,8 @@ void Tools::randomSpawn(std::string what) {
     }
 }
 
+///////////////////////////////////////////////
+
 void Tools::savePos(std::string what, int x, int y) {
     container temp;
     temp.x = x;
@@ -115,6 +124,8 @@ void Tools::savePos(std::string what, int x, int y) {
     else if(what == "obstacle")
         obstaclesPos.push_back(temp);
 }
+
+///////////////////////////////////////////////
 
 void Tools::getGameInfo() const {
     std::cout << "[LOGIC/GAME] Game state: " << logic.getGameState() << std::endl;
@@ -145,6 +156,8 @@ void Tools::getGameInfo() const {
     std::cout << std::endl;
 }
 
+///////////////////////////////////////////////
+
 void Tools::debug_display() const {
     for(int row=0;row<board.getBoardHeight();row++){
         for(int col=0;col<board.getBoardWidth();col++){
@@ -164,6 +177,8 @@ void Tools::debug_display() const {
         std::cout << std::endl;
     }
 }
+
+///////////////////////////////////////////////
 
 char Tools::getFieldInfo(int row, int col) const {
     if (board.hasFence(row, col))
@@ -188,6 +203,8 @@ char Tools::getFieldInfo(int row, int col) const {
         return ' ';
     return{};
 }
+
+///////////////////////////////////////////////
 
 void Tools::despawnOldest(std::string what) {
     if(!logic.isRunning()) {}

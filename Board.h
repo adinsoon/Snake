@@ -77,11 +77,6 @@ public:
     ///// snake control
     void turn(char dir);
     std::string getTurn() const;
-    /////
-    void clearSnake();
-
-    ///// top secret
-    void toggleWH(bool toggle);
 };
 
 

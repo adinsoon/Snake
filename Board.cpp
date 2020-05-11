@@ -22,6 +22,8 @@ Board::Board(int h, int w, int limit, Stats &s) : stats(s){
     board[snake[0].x][snake[0].y].hasHead = true;
 }
 
+/////////////////////////////////////////////////////
+
 int Board::getBoardHeight() const {
     return height;
 }
@@ -37,6 +39,8 @@ int Board::getSnakeLimit() const {
 int Board::getSnakeSize() const {
     return snakeSize;
 }
+
+/////////////////////////////////////////////////////
 
 bool Board::isOnBoard(int row, int col) const {
     return row>=0 && col>=0 && row<=height && col<=width;
@@ -89,6 +93,22 @@ bool Board::isHit() const {
     return false;
 }
 
+bool Board::isSnakeOut() const{
+    return !isOnBoard(snake[0].x, snake[0].y);
+}
+
+bool Board::isHeadAround(int row, int col) const {
+    for(int i=-3;i<4;i++){
+        for(int j=-3;j<4;j++){
+            if(isHead(row+i,col+j))
+                return true;
+        }
+    }
+    return false;
+}
+
+/////////////////////////////////////////////////////
+
 void Board::setFence(int row, int col, bool fence) {
     board[row][col].hasFence = fence;
 }
@@ -100,6 +120,8 @@ void Board::setFruit(int row, int col, bool fruit) {
 void Board::setObstacle(int row, int col, bool obstacle) {
     board[row][col].hasObstacle = obstacle;
 }
+
+/////////////////////////////////////////////////////
 
 void Board::growSnake(bool grow) {
     if(grow) snakeSize++;
@@ -120,16 +142,6 @@ void Board::turn(char dir) {
         || ((dir == 'D' || dir == 'd') && (getTurn() == "LEFT"))) {}
     else {
         update();
-//        if(WH) {
-//            if (snake[0].x >= height)
-//                snake[0].x = 0;
-//            else if (snake[0].y >= width)
-//                snake[0].y = 0;
-//            else if (snake[0].x <= 0)
-//                snake[0].x = height;
-//            else if (snake[0].y <= 0)
-//                snake[0].y = width;
-//        }
         for (int i=snakeSize;i>0; i--) {
             snake[i].x = snake[i - 1].x;
             snake[i].y = snake[i - 1].y;
@@ -178,33 +190,4 @@ void Board::eatFruit() {
     }
 }
 
-void Board::toggleWH(bool toggle) {
-    WH = toggle;
-}
-
-bool Board::isSnakeOut() const{
-    return !isOnBoard(snake[0].x, snake[0].y);
-}
-
-bool Board::isHeadAround(int row, int col) const {
-    for(int i=-3;i<4;i++){
-        for(int j=-3;j<4;j++){
-            if(isHead(row+i,col+j))
-                return true;
-        }
-    }
-    return false;
-}
-
-void Board::clearSnake() {
-    for(int i=0;i<snakeSize;i++){
-        snake[i].x = 0;
-        snake[i].y = 0;
-    }
-    for(int i=0;i<height;i++){
-        for(int j=0;i<width;j++){
-            board[i][j].hasHead = false;
-            board[i][j].hasTorso = false;
-        }
-    }
-}
+/////////////////////////////////////////////////////
